@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO Demo</title>
+    <style>
+        #messages { margin-bottom: 20px; }
+        .message { padding: 5px; }
+        #userInfo { 
+            background: #f0f0f0;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Socket.IO Demo</h1>
+    
+    <div id="userInfo">
+        <h3>Active Users Information:</h3>
+        <p id="activeCount">Active Users: 0</p>
+        <p id="locationInfo">Location: -</p>
+        <p id="cityInfo">City: -</p>
+        <p id="regionInfo">Region: -</p>
+        <p id="timezoneInfo">Timezone: -</p>
+        <p id="ipInfo">IP: -</p>
+    </div>
+    
+    <div id="messages"></div>
+    
+    <form id="form">
+        <input type="text" id="messageInput" placeholder="Type a message...">
+        <button type="submit">Send</button>
+    </form>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const form = document.getElementById('form');
+        const input = document.getElementById('messageInput');
+        const messages = document.getElementById('messages');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat message', input.value);
+                input.value = '';
+            }
+        });
+
+        socket.on('chat message', (msg) => {
+            const div = document.createElement('div');
+            div.classList.add('message');
+            div.textContent = msg;
+            messages.appendChild(div);
+        });
+
+        socket.on('active users', (data) => {
+            document.getElementById('activeCount').textContent = `Active Users: ${data.count}`;
+            document.getElementById('locationInfo').textContent = `Country: ${data.location.country}`;
+            document.getElementById('cityInfo').textContent = `City: ${data.location.city}`;
+            document.getElementById('regionInfo').textContent = `Region: ${data.location.region}`;
+            document.getElementById('timezoneInfo').textContent = `Timezone: ${data.location.timezone}`;
+            document.getElementById('ipInfo').textContent = `IP: ${data.ip}`;
+        });
+    </script>
+</body>
+</html>
